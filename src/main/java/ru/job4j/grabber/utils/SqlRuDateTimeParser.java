@@ -9,7 +9,19 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 public class SqlRuDateTimeParser implements DateTimeParser {
-    private static final Map<String, String> MONTHS = Map.ofEntries(entry("май", "may"), entry("янв", "jan"), entry("фев", "feb"), entry("мар", "mar"), entry("апр", "apr"), entry("июн", "jun"), entry("июл", "jul"), entry("авг", "Aug"), entry("сен", "sep"), entry("окт", "oct"), entry("ноя", "nov"), entry("дек", "dec"));
+    private static final Map<String, String> MONTHS = Map.ofEntries(
+            entry("май", "may"),
+            entry("янв", "jan"),
+            entry("фев", "feb"),
+            entry("мар", "mar"),
+            entry("апр", "apr"),
+            entry("июн", "jun"),
+            entry("июл", "jul"),
+            entry("авг", "Aug"),
+            entry("сен", "sep"),
+            entry("окт", "oct"),
+            entry("ноя", "nov"),
+            entry("дек", "dec"));
     @Override
     public LocalDateTime parse(String parse) {
         String date = parse.split(",")[0];
