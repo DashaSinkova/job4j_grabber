@@ -1,6 +1,8 @@
 package ru.job4j.models;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 public class Post {
 
@@ -16,6 +18,9 @@ public class Post {
         this.link = link;
         this.description = description;
         this.created = created;
+    }
+    public Post() {
+
     }
 
     public int getId() {
@@ -56,5 +61,16 @@ public class Post {
 
     public void setCreated(LocalDateTime created) {
         this.created = created;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{"
+                + "id=" + id
+                + ", title='" + title + '\''
+                + ", link='" + link + '\''
+                + ", description='" + description + '\''
+                + ", created=" + created.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"))
+                + '}';
     }
 }

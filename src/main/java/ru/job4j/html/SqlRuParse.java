@@ -6,7 +6,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import ru.job4j.grabber.utils.SqlRuDateTimeParser;
+import ru.job4j.models.Post;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -19,14 +22,26 @@ public class SqlRuParse {
             for (Element td : row) {
                 Element href = td.child(0);
                 System.out.println(href.attr("href"));
-            System.out.println(href.text());
-            System.out.println(doc.getElementsByAttribute("style").select(".altCol").get(count).text());
-            count++;
-            SqlRuDateTimeParser date = new SqlRuDateTimeParser();
-            System.out.println("Дата " + date.parse(td.parent().child(5).text()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
-            System.out.println();
+                System.out.println(href.text());
+                System.out.println(doc.getElementsByAttribute("style").select(".altCol").get(count).text());
+                count++;
+                SqlRuDateTimeParser date = new SqlRuDateTimeParser();
+                System.out.println("Дата " + date.parse(td.parent().child(5).text()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
+                System.out.println(SqlRuParse.getPost(href.attr("href")));
+                System.out.println();
             }
-        }
+       }
+    }
+
+    public static Post getPost(String href) throws IOException {
+        Document doc = Jsoup.connect(href).get();
+        Elements descriptionRow = doc.select(".msgBody");
+        Elements createdRow = doc.select(".msgFooter");
+        Post res = new Post();
+        LocalDateTime created = new SqlRuDateTimeParser().parse(createdRow.text().split(" \\[", 2)[0]);
+        res.setCreated(created);
+        res.setDescription(descriptionRow.get(1).text());
+        return res;
     }
 }
 
