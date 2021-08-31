@@ -35,7 +35,6 @@ public class SqlRuDateTimeParser implements DateTimeParser {
             dateArr[1] = MONTHS.get(dateArr[1]);
             date = dateArr[0] + " " + dateArr[1] + " " + dateArr[2];
         }
-        System.out.println(date);
         DateTimeFormatterBuilder formatterBuilder = new DateTimeFormatterBuilder();
         formatterBuilder.parseCaseInsensitive();
         formatterBuilder.appendPattern("d MMM yy HH:mm");

@@ -1,47 +1,69 @@
 package ru.job4j.html;
 
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import ru.job4j.grabber.Parse;
+import ru.job4j.grabber.utils.DateTimeParser;
 import ru.job4j.grabber.utils.SqlRuDateTimeParser;
 import ru.job4j.models.Post;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
-public class SqlRuParse {
-    public static void main(String[] args) throws Exception {
-        for (int page = 1; page <= 5; page++) {
-            Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers/" + page).get();
-            Elements row = doc.select(".postslisttopic");
-            int count = 0;
-            for (Element td : row) {
-                Element href = td.child(0);
-                System.out.println(href.attr("href"));
-                System.out.println(href.text());
-                System.out.println(doc.getElementsByAttribute("style").select(".altCol").get(count).text());
-                count++;
-                SqlRuDateTimeParser date = new SqlRuDateTimeParser();
-                System.out.println("Дата " + date.parse(td.parent().child(5).text()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
-                System.out.println(SqlRuParse.getPost(href.attr("href")));
-                System.out.println();
-            }
-       }
+public class SqlRuParse implements Parse {
+    private final DateTimeParser dateTimeParser;
+    private static List<Post> postList;
+
+    public SqlRuParse(DateTimeParser dateTimeParser) {
+        this.dateTimeParser = dateTimeParser;
     }
 
-    public static Post getPost(String href) throws IOException {
-        Document doc = Jsoup.connect(href).get();
+    public static void main(String[] args) throws Exception {
+        SqlRuParse sqlRuParse = new SqlRuParse(new SqlRuDateTimeParser());
+        postList = sqlRuParse.list("https://www.sql.ru/forum/job-offers/");
+
+        System.out.println(postList.toString());
+        System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1338061/mes-engineer-with-english"));
+    }
+
+    @Override
+    public List<Post> list(String link) throws IOException {
+        List<Post> result = new ArrayList<>();
+        Post post = new Post();
+        Document document = Jsoup.connect(link).get();
+        Elements row = document.select(".postslisttopic");
+        int id = 0;
+        for (Element td : row) {
+            Element href = td.child(0);
+            post.setId(id);
+            post.setTitle(href.text());
+            post.setLink(href.attr("href"));
+            post.setChangeTime(dateTimeParser.parse(td.parent().child(5).text()));
+            id++;
+            result.add(post);
+        }
+        return result;
+    }
+
+    @Override
+    public Post detail(String link) throws IOException {
+        Post post = new Post();
+        post.setLink(link);
+        int index = postList.indexOf(post);
+        post = postList.get(index);
+        Document doc = Jsoup.connect(link).get();
         Elements descriptionRow = doc.select(".msgBody");
         Elements createdRow = doc.select(".msgFooter");
-        Post res = new Post();
         LocalDateTime created = new SqlRuDateTimeParser().parse(createdRow.text().split(" \\[", 2)[0]);
-        res.setCreated(created);
-        res.setDescription(descriptionRow.get(1).text());
-        return res;
+        post.setCreated(created);
+        post.setDescription(descriptionRow.get(1).text());
+        postList.set(index, post);
+        return post;
     }
 }
 
