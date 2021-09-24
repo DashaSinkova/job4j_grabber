@@ -11,13 +11,11 @@ import ru.job4j.models.Post;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SqlRuParse implements Parse {
     private final DateTimeParser dateTimeParser;
-    private static List<Post> postList;
 
     public SqlRuParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
@@ -25,10 +23,8 @@ public class SqlRuParse implements Parse {
 
     public static void main(String[] args) throws Exception {
         SqlRuParse sqlRuParse = new SqlRuParse(new SqlRuDateTimeParser());
-        postList = sqlRuParse.list("https://www.sql.ru/forum/job-offers/");
-
-        System.out.println(postList.toString());
-        System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1338061/mes-engineer-with-english"));
+        System.out.println(sqlRuParse.list("https://www.sql.ru/forum/job-offers/").toString());
+        System.out.println(sqlRuParse.detail("https://www.sql.ru/forum/1338923/razrabotchik-bigdata-data-engineer"));
     }
 
     @Override
@@ -37,14 +33,11 @@ public class SqlRuParse implements Parse {
         Post post = new Post();
         Document document = Jsoup.connect(link).get();
         Elements row = document.select(".postslisttopic");
-        int id = 0;
         for (Element td : row) {
             Element href = td.child(0);
-            post.setId(id);
             post.setTitle(href.text());
             post.setLink(href.attr("href"));
             post.setChangeTime(dateTimeParser.parse(td.parent().child(5).text()));
-            id++;
             result.add(post);
         }
         return result;
@@ -54,15 +47,15 @@ public class SqlRuParse implements Parse {
     public Post detail(String link) throws IOException {
         Post post = new Post();
         post.setLink(link);
-        int index = postList.indexOf(post);
-        post = postList.get(index);
         Document doc = Jsoup.connect(link).get();
         Elements descriptionRow = doc.select(".msgBody");
         Elements createdRow = doc.select(".msgFooter");
         LocalDateTime created = new SqlRuDateTimeParser().parse(createdRow.text().split(" \\[", 2)[0]);
+        LocalDateTime changeTime = new SqlRuDateTimeParser().parse(createdRow.last().text().split(" \\[", 2)[0]);
         post.setCreated(created);
+        post.setChangeTime(changeTime);
         post.setDescription(descriptionRow.get(1).text());
-        postList.set(index, post);
+        post.setTitle(doc.select("title").text().split(" /")[0]);
         return post;
     }
 }
