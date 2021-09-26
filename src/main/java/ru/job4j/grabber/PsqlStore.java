@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Properties;
 
-public class PsqlStore implements Store, AutoCloseable{
+public class PsqlStore implements Store, AutoCloseable {
     private Connection cnn;
 
     public PsqlStore(Properties conf) throws SQLException {

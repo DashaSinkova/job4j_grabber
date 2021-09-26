@@ -50,8 +50,8 @@ public class SqlRuParse implements Parse {
         Document doc = Jsoup.connect(link).get();
         Elements descriptionRow = doc.select(".msgBody");
         Elements createdRow = doc.select(".msgFooter");
-        LocalDateTime created = new SqlRuDateTimeParser().parse(createdRow.text().split(" \\[", 2)[0]);
-        LocalDateTime changeTime = new SqlRuDateTimeParser().parse(createdRow.last().text().split(" \\[", 2)[0]);
+        LocalDateTime created = dateTimeParser.parse(createdRow.text().split(" \\[", 2)[0]);
+        LocalDateTime changeTime = dateTimeParser.parse(createdRow.last().text().split(" \\[", 2)[0]);
         post.setCreated(created);
         post.setChangeTime(changeTime);
         post.setDescription(descriptionRow.get(1).text());
