@@ -68,17 +68,19 @@ public class PsqlStore implements Store, AutoCloseable {
 
     @Override
     public Post findById(int id) {
-        Post res = new Post();
+        Post res = null;
         try (PreparedStatement statement = cnn.prepareStatement("select * from post where id = ?")) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    res.setId(resultSet.getInt(1));
-                    res.setTitle(resultSet.getString(2));
-                    res.setLink(resultSet.getString(3));
-                    res.setDescription(resultSet.getString(4));
-                    res.setCreated(resultSet.getTimestamp(5).toLocalDateTime());
-                    res.setChangeTime(resultSet.getTimestamp(6).toLocalDateTime());
+                if (resultSet.next()) {
+                    res = new Post(
+                            resultSet.getInt(1),
+                            resultSet.getString(2),
+                            resultSet.getString(3),
+                            resultSet.getString(4),
+                            resultSet.getTimestamp(5).toLocalDateTime(),
+                            resultSet.getTimestamp(6).toLocalDateTime()
+                    );
                 }
             }
 
@@ -92,7 +94,7 @@ public class PsqlStore implements Store, AutoCloseable {
         Properties properties = new Properties();
         properties.load(new FileInputStream("C:\\Projects\\job4j_grabber\\src\\main\\resources\\app.properties"));
         PsqlStore store = new PsqlStore(properties);
-        Post post = new Post(0, "test", "test5", "test", new SqlRuDateTimeParser().parse("21 сен 21, 12:20"), new SqlRuDateTimeParser().parse("21 сен 21, 12:20"));
+        Post post = new Post(0, "test", "test6", "test", new SqlRuDateTimeParser().parse("21 сен 21, 12:20"), new SqlRuDateTimeParser().parse("21 сен 21, 12:20"));
         store.save(post);
         System.out.println(store.getAll().toString());
         System.out.println(store.findById(5));
