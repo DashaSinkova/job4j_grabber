@@ -30,10 +30,11 @@ public class SqlRuParse implements Parse {
     @Override
     public List<Post> list(String link) throws IOException {
         List<Post> result = new ArrayList<>();
-        Post post = new Post();
+
         Document document = Jsoup.connect(link).get();
         Elements row = document.select(".postslisttopic");
         for (Element td : row) {
+            Post post = new Post();
             Element href = td.child(0);
             post.setTitle(href.text());
             post.setLink(href.attr("href"));
