@@ -4,6 +4,7 @@ import ru.job4j.grabber.utils.SqlRuDateTimeParser;
 import ru.job4j.html.SqlRuParse;
 import ru.job4j.models.Post;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.*;
@@ -92,7 +93,7 @@ public class PsqlStore implements Store, AutoCloseable {
 
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        properties.load(new FileInputStream("C:\\Projects\\job4j_grabber\\src\\main\\resources\\app.properties"));
+        properties.load(new FileInputStream("./src/main/resources/app.properties"));
         PsqlStore store = new PsqlStore(properties);
         Post post = new Post(0, "test", "test6", "test", new SqlRuDateTimeParser().parse("21 сен 21, 12:20"), new SqlRuDateTimeParser().parse("21 сен 21, 12:20"));
         store.save(post);

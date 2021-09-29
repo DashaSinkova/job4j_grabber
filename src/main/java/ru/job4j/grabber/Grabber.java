@@ -29,7 +29,7 @@ public class Grabber implements Grab {
     }
 
     public void cfg() {
-        try (InputStream input = new FileInputStream("C:\\Projects\\job4j_grabber\\src\\main\\resources\\app.properties")) {
+        try (InputStream input = new FileInputStream("./src/main/resources/app.properties")) {
             cfg.load(input);
         } catch (IOException e) {
             e.printStackTrace();
