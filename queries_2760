@@ -1,0 +1,8 @@
+/*имена всех person, которые не состоят в компании с id = 5; название компании для каждого человека.*/
+select p.name as name, c.name as company_name from person p left join company c on c.id = p.company_id
+where p.company_id <> 5;
+
+/* название компании с максимальным количеством человек + количество человек в этой компании.*/
+select c.name as company_name, count(p.company_id) as people_count from person p left join company c on c.id = p.company_id
+group by c.name
+order by count(p.company_id) DESC limit 1;
